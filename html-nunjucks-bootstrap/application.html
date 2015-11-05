@@ -10,22 +10,22 @@
     <link href="lib/css/bootswatch-yeti/bootstrap.min.css" rel="stylesheet">
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="lib/js/jquery.min.js" async></script>
+    <script src="lib/js/jquery.min.js"></script>
 
     <!-- Bootstrap -->
-    <script src="lib/js/bootstrap.min.js" async></script>
+    <script src="lib/js/bootstrap.min.js"></script>
 
     <!-- Template rendering -->
-    <script src="lib/js/nunjucks.min.js" async></script>
+    <script src="lib/js/nunjucks.min.js"></script>
 
     <!-- For loading javascript into the application dynamically -->
-    <script src="lib/js/lazyLoad.js" async></script>
+    <script src="lib/js/lazyLoad.js"></script>
 
     <!-- For manipulating the URI -->
-    <script src="lib/js/URI.js" async></script>
+    <script src="lib/js/URI.js"></script>
 
     <!-- Byteport client library -->
-    <script src="lib/js/byteportAPIv1.js" async></script>
+    <script src="lib/js/byteportAPIv1.js"></script>
 
 </head>
 
@@ -35,12 +35,14 @@
 
     <script type="application/javascript">
 
-        var byteport_client = new ByteportAPIv1(byteport_api_host);
+        var byteport_client;
 
         /**
          * Whenever the page is (re-)loaded, this is what happen:
          */
         $( document ).ready(function() {
+            byteport_client = new ByteportAPIv1(byteport_api_host);
+
             // Nunjucks init, set view directory as template dir
             nunjucks.configure('app/views', {autoescape: true});
 

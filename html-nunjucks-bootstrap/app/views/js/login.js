@@ -7,7 +7,8 @@ function modelAndView(context, callback) {
     callback();
 }
 
-function onSuccessfulLogin() {
+function onSuccessfulLogin(data) {
+    debug('onSuccessfulLogin()');
     redirectTo(ROOT_VIEW);
 }
 

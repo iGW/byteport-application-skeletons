@@ -19,11 +19,31 @@ var ByteportAPIv1 = function (api_host, username, password) {
     // Methods
     this.ECHO = '/api/v1/echo/';
     this.SESSION_STATUS = '/api/v1/session/';
-    this.ACCOUNT_LOGIN = '/api/accounts/login/';
-    this.ACCOUNT_LOGOUT = '/api/accounts/logout/';
+    this.ACCOUNT_LOGIN = '/api/v1/login/';
+    this.ACCOUNT_LOGOUT = '/api/v1/logout/';
     this.LIST_NAMESPACES = '/api/v1/namespaces/';
     this.LIST_DEVICES = '/api/v1/devices/[namespace]/';
 
+
+    $.ajaxSetup({
+        error: function(jqXHR, exception) {
+            if (jqXHR.status === 0) {
+                alert('Not connect.\n Verify Network.');
+            } else if (jqXHR.status == 404) {
+                alert('Requested page not found. [404]');
+            } else if (jqXHR.status == 500) {
+                alert('Internal Server Error [500].');
+            } else if (exception === 'parsererror') {
+                alert('Requested JSON parse failed.');
+            } else if (exception === 'timeout') {
+                alert('Time out error.');
+            } else if (exception === 'abort') {
+                alert('Ajax request aborted.');
+            } else {
+                alert('Uncaught Error.\n' + jqXHR.responseText);
+            }
+        }
+    });
 
     that.get_apiv1_url = function () {
         return that.api_host + that.API_URL_BASE;
@@ -50,8 +70,6 @@ var ByteportAPIv1 = function (api_host, username, password) {
             }
         );
 
-        //alert(jQuery.cookie("csrftoken"));
-
         var login_data = {
             'username': username,
             'password': password,
@@ -62,13 +80,13 @@ var ByteportAPIv1 = function (api_host, username, password) {
             url: login_url,
             data: login_data,
             method: "POST",
-            success: callback,
+            success: function (data) {
+                callback(data);
+            },
             xhrFields: {
                 withCredentials: true
             }
         });
-
-        return this;
     };
 
     that.logout = function(callback) {
@@ -80,7 +98,9 @@ var ByteportAPIv1 = function (api_host, username, password) {
             url: that.logout_url(),
             data: logout_data,
             method: "POST",
-            success: callback,
+            success: function (data) {
+                callback(data);
+            },
             xhrFields: {
                 withCredentials: true
             }
