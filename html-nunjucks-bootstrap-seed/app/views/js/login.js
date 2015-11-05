@@ -3,7 +3,7 @@
  *
  * @param callback
  */
-function modelAndView(callback) {
+function modelAndView(context, callback) {
     callback();
 }
 
@@ -16,5 +16,7 @@ function onSuccessfulLogin() {
  *
  */
 function onLoginClick() {
-    byteport_client.login('admin', 'admin', onSuccessfulLogin);
+    var username = $('#login-username').val();
+    var password = $('#login-password').val();
+    byteport_client.login(username, password, onSuccessfulLogin);
 }

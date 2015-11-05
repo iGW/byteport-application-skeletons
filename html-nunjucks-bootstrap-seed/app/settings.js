@@ -1,3 +1,4 @@
+var DEBUG = true;
 var byteport_api_host = "http://localhost:8000";
 
 /**
@@ -11,7 +12,10 @@ var byteport_api_host = "http://localhost:8000";
  *
  * @type {string[]}
  */
-var application_views = ['login', 'logout', 'not_found', 'home'];
+var application_views = ['login', 'logout', 'not_found', 'home', 'devices'];
+
+// What GET-parameter to use when determining what view the user requested
+var VIEWS_PREFIX='_view';
 
 // Some static views that need to be set for the application to handle errors etc.
 var LOGIN_VIEW = 'login';

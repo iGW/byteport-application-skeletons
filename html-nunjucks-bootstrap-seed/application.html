@@ -7,34 +7,29 @@
     <link rel="import" href="lib/includes/bootstrap_heads.html">
 
     <!-- Application specific Bootstrap theme, more at: https://bootswatch.com/     -->
-    <link href="lib/css/bootswatch-flatly/bootstrap.min.css" rel="stylesheet">
+    <link href="lib/css/bootswatch-darkly/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="lib/js/jquery.min.js" async></script>
+
+    <!-- Bootstrap -->
+    <script src="lib/js/bootstrap.min.js" async></script>
+
+    <!-- Template rendering -->
+    <script src="lib/js/nunjucks.min.js" async></script>
+
+    <!-- For loading javascript into the application dynamically -->
+    <script src="lib/js/lazyLoad.js" async></script>
+
+    <!-- For manipulating the URI -->
+    <script src="lib/js/URI.js" async></script>
+
+    <!-- Byteport client library -->
+    <script src="lib/js/byteportAPIv1.js" async></script>
 
 </head>
 
 <body>
-    <div id="nunjucks_application" class="">
-        <!-- Application contents goes here -->
-    </div>
-
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"
-            integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ=="
-            crossorigin="anonymous"></script>
-
-    <!-- Template rendering -->
-    <script src="lib/js/nunjucks.min.js"></script>
-
-    <!-- For loading javascript into the application dynamically -->
-    <script src="lib/js/lazyLoad.js"></script>
-
-    <!-- For manipulating the URI -->
-    <script src="lib/js/URI.js"></script>
-
-    <!-- Byteport client library -->
-    <script src="lib/js/byteportAPIv1.js"></script>
 
     <script src="app/settings.js"></script>
 
@@ -42,13 +37,13 @@
 
         var byteport_client = new ByteportAPIv1(byteport_api_host);
 
-        // Nunjucks init, set view directory as template dir
-        nunjucks.configure('app/views', {autoescape: true});
-
         /**
          * Whenever the page is (re-)loaded, this is what happen:
          */
         $( document ).ready(function() {
+            // Nunjucks init, set view directory as template dir
+            nunjucks.configure('app/views', {autoescape: true});
+
             // Create the view_maps for easy access
             build_views();
 
@@ -56,6 +51,11 @@
             handleURL();
         });
 
+        function debug(message) {
+            if (DEBUG) {
+                console.log(message);
+            }
+        }
         /**
          * The views_map is supplied and can be used by the template views,
          * for example like this:
@@ -63,8 +63,6 @@
          *   <a href="?{{ views.home }}">Home</a>
          */
         var views_map = {};
-
-        VIEWS_PREFIX='_view';
 
         function build_views() {
             var v;
@@ -88,6 +86,7 @@
          */
         var context = {};
         function handleURL() {
+            debug('handleURL()');
 
             // Parse URI to understand what the user wants to achieve
             // ie: http://localhost:63342/application.html?view=home
@@ -113,7 +112,7 @@
                 'query': parsed_query
             };
 
-            // Check if authenticated
+            // Check if authenticated, this could maybe be optimized with a cached result.
             byteport_client.is_authenticated(function (data) {
                     if (data.is_authenticated) {
                         // YES - Authenticated vs backend, move on
@@ -151,15 +150,16 @@
         }
 
         function renderView(viewName) {
-            console.log("Rendering "+viewName);
+            debug("renderView(): (start) view: "+viewName);
 
             // Load the JavaScript part of the view first, and upon completion....
-            LazyLoad.js("app/views/"+viewName+".js", function () {
+            LazyLoad.js("app/views/js/"+viewName+".js", function () {
                 // ... execute the modelAndView() method of this view
-                modelAndView(function(data) {
+                modelAndView(context, function(data) {
                         // This will be exectued later (ie. possibly after an API-call etc.)
+                        debug("renderView(): (completing) view: "+viewName);
                         $('#nunjucks_application')[0].innerHTML =
-                                nunjucks.render(viewName+'.html',
+                                nunjucks.render('html/'+viewName+'.html',
                                         {   'data': data,
                                             'context': context,
                                             'views': views_map
@@ -170,6 +170,10 @@
         }
 
     </script>
+
+    <div id="nunjucks_application" class="">
+        <!-- Application contents goes here -->
+    </div>
 
 </body>
 </html>

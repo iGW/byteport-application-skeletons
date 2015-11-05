@@ -59,7 +59,20 @@
         This application uses AJAX (CORS - Cross-Origin Resource Sharing)
         calls to fetch data and render the data using nunjucks templates.</p>
 
+    <h2>Byteport setup</h2>
+    <p>You will need to have an account and a namespace set up on Byteport. Preferably you will also need to have a
+        couple of devices to work against during development.</p>
+    <ol>
+        <li>Register a user at <a href="http://www.byteport.se/home/">Byteport</a> first.</li>
+        <li>Log in and <a href="http://www.byteport.se/manager/namespace/create">create a namespace</a></li>
+        <li>Register at least one device under your namespace.</li>
+        <li>You do not need to connect any actual device to try out the application demo below.</li>
+    </ol>
+
     <h2>Application demo</h2>
+
+    <p>If you do not wish to create your own user, namespace and device, you can go a head and try the application
+    demo using the Byteport demo user, <strong>demo / demo</strong>.</p>
 
     <p>Open up the application and feel free to open up your programmers tab in your favourite browser to tag along:</p>
     <a class="btn btn-primary" href="application.html" role="button" target="_blank">Open application</a>
@@ -71,11 +84,14 @@
         to tag along while browsing the application demo. Read more below to get an introduction to the concepts
         and for some tips and tricks on how to deploy your application.</p>
 
-    <h3>Copy this git repository</h3>
+    <h3>Clone and make a private copy</h3>
     <p>Make an archive copy of the Byteport Client examples to obtain a source code tree detached from git:</p>
-    <pre>$ git archive https://github.com/iGW/byteport-application-skeletons html-nunjucks-bootstrap-seed</pre>
-
-    <h3>Byteport setup</h3>
+    <pre>
+$ git clone https://github.com/iGW/byteport-application-skeletons
+$ mkdir ~/my-byteport-app
+$ git archive master | tar -x -C ~/my-project</pre>
+    <p>The commands above will export all contents from the repository to a private directory so you may want to delete
+    contents of no interest inside ~/my-byteport-app/.</p>
 
     <h3>Application customization</h3>
     <p>After you have made the housekeeping of cloning the repository and have had your devices set-up in Byteport, you
@@ -111,6 +127,20 @@
 
     <strong>myview.html</strong>
     <pre>
+< !-- The view markup is rendered using the <a href="https://mozilla.github.io/nunjucks/templating.html">nunjucks template engine.</a>
+
+      The view has three objects available to it by default
+
+         data -
+          If any data was loaded before the render step, the JSON response will be placed here.
+
+         context -
+          Contains the request parameters (just as in the [view].js below) and a few other things.
+          Access them like {{ context.q.namespace }} for example.
+
+         views -
+          The views you defined in settings.js is available to the view
+-->
 {% extends "base.html" %}
 {% block contents %}
 {% endblock %}</pre>
@@ -118,20 +148,40 @@
     <strong>myview.js</strong>
     <pre>
 /**
- * All [view].js methods must have this method defined!
+ * !!! All [view].js methods must have this method defined !!!
  *
- * @param callback
+ * Perform view logic here, fetch data or whatever you are up to, but remember to
+ * always execute the renderViewCallback last!
+ *
+ * If you do not need to fetch any data, just execute the renderViewCallback()
+ * directly in this method.
+ *
+ * The request data is available to the view:
+ *
+ * Example:
+ *  If the requested URL was:
+ *  http://localhost/application.html?_view=devices&namespace=test
+ *
+ *  Then the namespace parameter is available as:
+ *
+ *  q.namespace
+ *
+ * @param context  - object with useful data to the view
+ * @param callback - the callback to call last (or pass on for later call).
  */
-function modelAndView(renderViewCallback) {
-            // Perform view logic here, fetch data or whatever you are up to, but remember to
-            // allways execute the renderViewCallback last!
+function modelAndView(context, renderViewCallback) {
+    debug(context);
 
-            // If you do not need to fetch any data, just execute the renderViewCallback()
-            renderViewCallback();
+    // Load data, and if done asynchronously, you must pass the renderViewCallback to that method
+
+    renderViewCallback();
+}
+
 /**
  * Put all other JavaScript logic related to your view below this line, remember that no
  * javascript can be kept in the .html-file due to browser security issues.
  */
+
 }</pre>
     <h4>Controller</h4>
     The only file you probably need to touch in this part of the application is the settings.js file explained

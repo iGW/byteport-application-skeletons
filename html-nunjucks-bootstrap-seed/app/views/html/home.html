@@ -13,7 +13,7 @@
     {% for namespace in data %}
     <tr>
         <td>
-            <a href="?{{ view.namespace }}&namespace={{ namespace.name }}">{{ namespace.name }}</a>
+            <a href="?{{ views.devices }}&namespace={{ namespace.name }}">{{ namespace.name }}</a>
         </td>
         <td>
             {{ namespace.http_write_method }}

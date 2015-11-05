@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block contents %}
+    <h3>Devices in namespace {{context.q.namespace}}</h3>
+    <p>The data below was fetched using a JSONP service on the Byteport backend. Go nuts from here!</p>
+
+    <table class="table">
+        <tr>
+            <th>Device UID</th>
+            <th>Alias</th>
+            <th>Timeout limit</th>
+            <th>Type</th>
+            <th>Last contact</th>
+        </tr>
+
+        {% for device in data %}
+        <tr>
+            <td>
+                {{ device.uid }}
+            </td>
+            <td>
+                {{ device.alias }}
+            </td>
+            <td>
+                {{ device.timeout_limit }}
+            </td>
+            <td>
+                {{ device.device_type }}
+            </td>
+            <td>
+                {{ device.last_contact }}
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+{% endblock %}

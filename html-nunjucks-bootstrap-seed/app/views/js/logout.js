@@ -3,7 +3,7 @@
  *
  * @param callback
  */
-function modelAndView(callback) {
+function modelAndView(context, callback) {
 
     byteport_client.logout(callback());
 

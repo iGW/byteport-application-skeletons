@@ -22,6 +22,7 @@ var ByteportAPIv1 = function (api_host, username, password) {
     this.ACCOUNT_LOGIN = '/api/accounts/login/';
     this.ACCOUNT_LOGOUT = '/api/accounts/logout/';
     this.LIST_NAMESPACES = '/api/v1/namespaces/';
+    this.LIST_DEVICES = '/api/v1/devices/[namespace]/';
 
 
     that.get_apiv1_url = function () {
@@ -34,7 +35,7 @@ var ByteportAPIv1 = function (api_host, username, password) {
 
     that.logout_url = function () {
         return that.api_host + that.ACCOUNT_LOGOUT;
-    }
+    };
 
     that.login = function (username, password, callback) {
         console.log('ByteportAPIv1 vs ' + that.get_apiv1_url());
@@ -87,14 +88,18 @@ var ByteportAPIv1 = function (api_host, username, password) {
     };
 
     that.is_authenticated = function(callback) {
-        async_jsonp(that.SESSION_STATUS, callback);
+        async_get_jsonp(that.SESSION_STATUS, callback);
     };
 
     that.get_namespaces = function (callback) {
-        async_jsonp(that.LIST_NAMESPACES, callback);
+        async_get_jsonp(that.LIST_NAMESPACES, callback);
     };
 
-    function async_jsonp(method, callback) {
+    that.get_devices = function (namespace, callback) {
+        async_get_jsonp(that.LIST_DEVICES.replace('[namespace]', namespace), callback);
+    };
+
+    function async_get_jsonp(method, callback) {
         jQuery.ajax({
                 url: that.api_host + method,
                 method: "GET",
@@ -104,7 +109,7 @@ var ByteportAPIv1 = function (api_host, username, password) {
                 }
             }
         );
-    };
+    }
 
     function getCookie(cname) {
         var name = cname + "=";

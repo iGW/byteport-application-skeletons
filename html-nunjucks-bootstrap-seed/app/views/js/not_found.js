@@ -3,6 +3,6 @@
  *
  * @param callback
  */
-function modelAndView(callback) {
+function modelAndView(context, callback) {
     callback();
 }
