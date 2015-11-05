@@ -123,10 +123,10 @@
                         // Verify that the requested view exists
                         if (application_views.indexOf(requested_view) > -1) {
                             // Render some default view if we did not find the correct one
-                            renderView(requested_view);
+                            loadAndRenderView(requested_view);
                         } else {
                             // Render the not_found view
-                            renderView(VIEW_NOT_FOUND);
+                            loadAndRenderView(VIEW_NOT_FOUND);
                         }
 
                     } else {
@@ -134,7 +134,7 @@
                         context.is_authenticated = false;
 
                         // Render login if user was not logged in
-                        renderView(LOGIN_VIEW);
+                        loadAndRenderView(LOGIN_VIEW);
                     }
                 }
             )
@@ -151,23 +151,38 @@
              window.location.href = "?"+VIEWS_PREFIX+"="+viewName;
         }
 
+        /**
+         * Just a wrapper around renderView()
+         */
+        function updateView(viewName) {
+            renderView(viewName);
+        }
+
         function renderView(viewName) {
+            modelAndView(context, function(data) {
+                    // This will be exectued later (ie. possibly after an API-call etc.)
+                    debug("renderView(): (completing) view: "+viewName);
+                    $('#nunjucks_application')[0].innerHTML =
+                            nunjucks.render('html/'+viewName+'.html',
+                                    {   'data': data,
+                                        'context': context,
+                                        'views': views_map
+                                    });
+                }
+            )
+        }
+
+        /**
+         * This will load the (new) javascript and then call the renderView() when that is done.
+         *
+         * @param viewName
+         */
+        function loadAndRenderView(viewName) {
             debug("renderView(): (start) view: "+viewName);
 
             // Load the JavaScript part of the view first, and upon completion....
             LazyLoad.js("app/views/js/"+viewName+".js", function () {
-                // ... execute the modelAndView() method of this view
-                modelAndView(context, function(data) {
-                        // This will be exectued later (ie. possibly after an API-call etc.)
-                        debug("renderView(): (completing) view: "+viewName);
-                        $('#nunjucks_application')[0].innerHTML =
-                                nunjucks.render('html/'+viewName+'.html',
-                                        {   'data': data,
-                                            'context': context,
-                                            'views': views_map
-                                        });
-                    }
-                )
+                renderView(viewName);
             });
         }
 
