@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Byteport Application Example</title>
+
+    <!-- Sleek way of including the ususal suspects in a bootstrap application -->
+    <link rel="import" href="lib/includes/bootstrap_heads.html">
+
+    <!-- Application specific Bootstrap theme, more at: https://bootswatch.com/     -->
+    <link href="lib/css/bootswatch-flatly/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <div id="nunjucks_application" class="">
+        <!-- Application contents goes here -->
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"
+            integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ=="
+            crossorigin="anonymous"></script>
+
+    <!-- Template rendering -->
+    <script src="lib/js/nunjucks.min.js"></script>
+
+    <!-- For loading javascript into the application dynamically -->
+    <script src="lib/js/lazyLoad.js"></script>
+
+    <!-- For manipulating the URI -->
+    <script src="lib/js/URI.js"></script>
+
+    <!-- Byteport client library -->
+    <script src="lib/js/byteportAPIv1.js"></script>
+
+    <script src="app/settings.js"></script>
+
+    <script type="application/javascript">
+
+        var byteport_client = new ByteportAPIv1(byteport_api_host);
+
+        // Nunjucks init, set view directory as template dir
+        nunjucks.configure('app/views', {autoescape: true});
+
+        /**
+         * Whenever the page is (re-)loaded, this is what happen:
+         */
+        $( document ).ready(function() {
+            // Create the view_maps for easy access
+            build_views();
+
+            // Render the requested view or redirect to Login
+            handleURL();
+        });
+
+        /**
+         * The views_map is supplied and can be used by the template views,
+         * for example like this:
+         *
+         *   <a href="?{{ views.home }}">Home</a>
+         */
+        var views_map = {};
+
+        VIEWS_PREFIX='_view';
+
+        function build_views() {
+            var v;
+            var len = application_views.length;
+            for (var i = 0; i < len; i++) {
+                v = application_views[i];
+                views_map[v] = VIEWS_PREFIX+'='+v;
+            }
+        }
+        /**
+         * The purpose is to figure out what the user wants to achieve:
+         *
+         * 1) Parse the URL (to obtain view and request data)
+         * 2) Cook up som contextual data (not business data)
+         * 3) Determine if user is authenticated
+         *    - if not, render the login-view first.
+         * 4) Kick off the rendering of the requested view if possible.
+         *    - if the URL was not found, render the not_found page instead.
+         *
+         * (think request handler on server-side application code)
+         */
+        var context = {};
+        function handleURL() {
+
+            // Parse URI to understand what the user wants to achieve
+            // ie: http://localhost:63342/application.html?view=home
+            var url = window.location.href;
+            var uri = new URI(url);
+
+            // Parse the query part (ie after ?)
+            var parsed_query = URI.parseQuery(uri.query());
+            var requested_view = parsed_query[VIEWS_PREFIX];
+
+            // If the VIEWS_PREFIX parameter is not set, redirect immediately
+            // Note that this is different to if _view is set to something unknown
+            // which is handled below
+            if (requested_view == null || requested_view == "") {
+               redirectTo(ROOT_VIEW);
+            }
+
+            // Context data from the request path, this will be fed to the views
+            context = {
+                'byteport_api_host': byteport_api_host,
+                'view': requested_view,
+                'q': parsed_query,
+                'query': parsed_query
+            };
+
+            // Check if authenticated
+            byteport_client.is_authenticated(function (data) {
+                    if (data.is_authenticated) {
+                        // YES - Authenticated vs backend, move on
+                        context.is_authenticated = true;
+
+                        // Verify that the requested view exists
+                        if (application_views.indexOf(requested_view) > -1) {
+                            // Render some default view if we did not find the correct one
+                            renderView(requested_view);
+                        } else {
+                            // Render the not_found view
+                            renderView(VIEW_NOT_FOUND);
+                        }
+
+                    } else {
+                        // NO - Not authenticated, redirect to login)
+                        context.is_authenticated = false;
+
+                        // Render login if user was not logged in
+                        renderView(LOGIN_VIEW);
+                    }
+                }
+            )
+        }
+
+        /**
+         * If this method is called, the page will be reloaded with the VIEWS_PREFIX
+         * parameter set to the requested one and the flow of control will
+         * then land in the handleURL() method again.
+         *
+         * @param viewName
+         */
+        function redirectTo(viewName) {
+             window.location.href = "?"+VIEWS_PREFIX+"="+viewName;
+        }
+
+        function renderView(viewName) {
+            console.log("Rendering "+viewName);
+
+            // Load the JavaScript part of the view first, and upon completion....
+            LazyLoad.js("app/views/"+viewName+".js", function () {
+                // ... execute the modelAndView() method of this view
+                modelAndView(function(data) {
+                        // This will be exectued later (ie. possibly after an API-call etc.)
+                        $('#nunjucks_application')[0].innerHTML =
+                                nunjucks.render(viewName+'.html',
+                                        {   'data': data,
+                                            'context': context,
+                                            'views': views_map
+                                        });
+                    }
+                )
+            });
+        }
+
+    </script>
+
+</body>
+</html>

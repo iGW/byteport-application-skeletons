@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block contents %}
+<h1>Home</h1>
+    <p>This is the home page for this application.</p>
+<h3>Namespaces</h3>
+<p>Select a namespace to work with</p>
+<table class="table">
+    <tr>
+        <th>Name</th>
+        <th>HTTP Write Method</th>
+    </tr>
+
+    {% for namespace in data %}
+    <tr>
+        <td>
+            <a href="?{{ view.namespace }}&namespace={{ namespace.name }}">{{ namespace.name }}</a>
+        </td>
+        <td>
+            {{ namespace.http_write_method }}
+        </td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+<button class="btn btn-primary" onclick="onGetNamespacesClick()">Update</button>
+{% endblock %}

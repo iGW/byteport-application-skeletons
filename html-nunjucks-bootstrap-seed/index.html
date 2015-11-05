@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Byteport Application Seed</title>
+    <link rel="import" href="lib/includes/bootstrap_heads.html">
+</head>
+<body>
+<div class="container">
+    <h1>Byteport Application Example</h1>
+    <hr>
+    <h2>What is this?</h2>
+
+    <p>This application is an example on how to build a <strong>free-standing web-application</strong> using client side
+        technologies only and instead rely on a HTTP REST API to the backend. This means that the application
+        code (HTML and javascript) can be <strong>deployed anywhere and independently</strong> of the Byteport backend
+        - or even better, the backend can be selected as the first step before login. The purpose is to get a developer
+        up and running with application development vs. <strong>Byteport data</strong> in no time.
+    </p>
+
+    <h2>Technologies</h2>
+
+    <p>
+        This an HTML5 application skeleton that can be used as a template and is built around the following
+        technologies:
+    </p>
+    <table class="table">
+        <tr>
+            <th>Technology</th>
+            <th>Documentation</th>
+            <th>Comment</th>
+        </tr>
+        <tr>
+            <th>Javascript</th>
+            <th><a href="http://devdocs.io/javascript/">devdocs.io/javascript/</a></th>
+            <th>The usual...</th>
+        </tr>
+        <tr>
+            <th>jQuery</th>
+            <th><a href="https://api.jquery.com/">api.jquery.com</a></th>
+            <th>The usual...</th>
+        </tr>
+        <tr>
+            <th>nunjucks</th>
+            <th><a href="https://mozilla.github.io/nunjucks/">mozilla.github.io/nunjucks/</a></th>
+            <th>Template rendering of views</th>
+        </tr>
+        <tr>
+            <th>URI</th>
+            <th><a href="http://medialize.github.io/URI.js/">medialize.github.io/URI.js/</a></th>
+            <th>Parser to enable stateful URLs</th>
+        </tr>
+        <tr>
+            <th>Bootstrap</th>
+            <th><a href="http://getbootstrap.com/components/">getbootstrap.com/components/</a></th>
+            <th>Markup / CSS</th>
+        </tr>
+    </table>
+    <p>This application example is suitable as a model for <strong>small to medium</strong> sized applications.
+        This application uses AJAX (CORS - Cross-Origin Resource Sharing)
+        calls to fetch data and render the data using nunjucks templates.</p>
+
+    <h2>Application demo</h2>
+
+    <p>Open up the application and feel free to open up your programmers tab in your favourite browser to tag along:</p>
+    <a class="btn btn-primary" href="application.html" role="button" target="_blank">Open application</a>
+
+    <h2>Whats next?</h2>
+
+    <p>Make a fork of this github repository and have a look at the source, copy and paste at will if you need to.
+        Check out the documentation links above and of course, open up your browsers <strong>developer view</strong>
+        to tag along while browsing the application demo. Read more below to get an introduction to the concepts
+        and for some tips and tricks on how to deploy your application.</p>
+
+    <h3>Copy this git repository</h3>
+    <p>Make an archive copy of the Byteport Client examples to obtain a source code tree detached from git:</p>
+    <pre>$ git archive https://github.com/iGW/byteport-application-skeletons html-nunjucks-bootstrap-seed</pre>
+
+    <h3>Byteport setup</h3>
+
+    <h3>Application customization</h3>
+    <p>After you have made the housekeeping of cloning the repository and have had your devices set-up in Byteport, you
+    are ready to begin the fun. If you are familiar with web-development the easiest way to lern is by open up your
+    developer tab in your browser and tag along while navigating the seed application. If you are not that familiar with
+    either HTML or Javascript you will then have to learn before or as you go.</p>
+
+    <h3>About the MVC design</h3>
+    <p>The application seed implements a <strong>light-weight</strong> approach to MVC application design. The idea
+    is to lessen the burden of the application developer by providing a few nifty tricks in conjunction with the nice
+    <strong>nunjucks</strong> template language which is one essential to good web-application development (the other
+    beeing the component approach, used by the React framework for example).</p>
+
+    <h4>Model</h4>
+    <p>This free-standing HTML/Javascript application does not of course use database directly but instead relies
+    on API-calls to the backend through the <strong>Byteport API</strong>. So that is our "model"-part of the application
+    the important concept here is: the model must never know or have any connection to the view at all. There must
+    be no references, pointers, imports or whateve in the components representing the Model part of the application.</p>
+
+    <h4>View</h4>
+    <p>Since the view is an implementation of the model concepts, the views must know of the model data. The views
+    part of the application consists of the HTML and Javascript files. The HTML part of the views are actually
+    rendered nunjucks templates. What the controller does is to load the requested data and render the data using
+    the templates into pure HTML for the user. </p>
+
+    <p>All views should be placed inside <strong>app/views</strong> and register the view in
+        <strong>app/settings.js</strong>. Two files (HTML and .js) for each view as you can see
+        in the example views that are provided by the seed application. Use the code below as minimal starting
+        points for any view.</p>
+
+    <div class="alert alert-warning" role="alert"><strong>Important: </strong> you can not have any in-line Javascript
+    in your .html-file as that code is dynamically inserted and hence browsers will not allow it to execute.</div>
+
+    <strong>myview.html</strong>
+    <pre>
+{% extends "base.html" %}
+{% block contents %}
+{% endblock %}</pre>
+    <br>
+    <strong>myview.js</strong>
+    <pre>
+/**
+ * All [view].js methods must have this method defined!
+ *
+ * @param callback
+ */
+function modelAndView(renderViewCallback) {
+            // Perform view logic here, fetch data or whatever you are up to, but remember to
+            // allways execute the renderViewCallback last!
+
+            // If you do not need to fetch any data, just execute the renderViewCallback()
+            renderViewCallback();
+/**
+ * Put all other JavaScript logic related to your view below this line, remember that no
+ * javascript can be kept in the .html-file due to browser security issues.
+ */
+}</pre>
+    <h4>Controller</h4>
+    The only file you probably need to touch in this part of the application is the settings.js file explained
+
+    <h5>app/settings.js</h5>
+    <p>This is the place where you make you register your views and set up a few other things.</p>
+
+    <h5>application.html</h5>
+    <p>To a start, you will not need to touch this file much. This part is sort of the controller of the application.
+        and will help you out with redirecting and kick in the rendering of the views you design.</p>
+
+    <h5>app/lib</h5>
+    <p>Local copies of the libraries or frameworks that the application depends on are placed here. Some of the files
+    are loaded from CDN to reduce the traffic vs. your site.</p>
+
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"
+        integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ=="
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
