@@ -35,6 +35,15 @@
 
     <script type="application/javascript">
 
+        /**
+         * The views_map is supplied to, and can be used by the template views,
+         * for example like this:
+         *
+         *   <a href="?{{ views.home }}">Home</a>
+         */
+        var views_map = {};
+        var context = {};
+
         var byteport_client;
 
         /**
@@ -58,13 +67,7 @@
                 console.log(message);
             }
         }
-        /**
-         * The views_map is supplied and can be used by the template views,
-         * for example like this:
-         *
-         *   <a href="?{{ views.home }}">Home</a>
-         */
-        var views_map = {};
+
 
         function build_views() {
             var v;
@@ -86,7 +89,6 @@
          *
          * (think request handler on server-side application code)
          */
-        var context = {};
         function handleURL() {
             debug('handleURL()');
 
