@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Byteport Application Example</title>
 
     <!-- Sleek way of including the ususal suspects in a bootstrap application -->
@@ -50,7 +54,6 @@
          * Whenever the page is (re-)loaded, this is what happen:
          */
         $( document ).ready(function() {
-            byteport_client = new ByteportAPIv1(byteport_api_host);
 
             // Nunjucks init, set view directory as template dir
             nunjucks.configure('app/views', {autoescape: true});
@@ -115,6 +118,14 @@
                 'q': parsed_query,
                 'query': parsed_query
             };
+
+            // Override settings.js if host was set from query-string
+            var byteport_api_host_from_query = parsed_query['byteport_api_host'];
+            if(byteport_api_host_from_query !== undefined) {
+                byteport_api_host=byteport_api_host_from_query;
+            }
+
+            byteport_client = new ByteportAPIv1(byteport_api_host);
 
             // Check if authenticated, this could maybe be optimized with a cached result.
             byteport_client.is_authenticated(function (data) {

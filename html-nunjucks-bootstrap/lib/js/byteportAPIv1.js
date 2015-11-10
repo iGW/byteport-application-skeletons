@@ -24,7 +24,6 @@ var ByteportAPIv1 = function (api_host, username, password) {
     this.LIST_NAMESPACES = '/api/v1/namespaces/';
     this.LIST_DEVICES = '/api/v1/devices/[namespace]/';
 
-
     $.ajaxSetup({
         error: function(jqXHR, exception) {
             if (jqXHR.status === 0) {
@@ -49,6 +48,10 @@ var ByteportAPIv1 = function (api_host, username, password) {
         return that.api_host + that.API_URL_BASE;
     };
 
+    that.csrftoken_url = function () {
+        return that.api_host + "/api/";
+    };
+
     that.login_url = function () {
         return that.api_host + that.ACCOUNT_LOGIN;
     };
@@ -64,16 +67,25 @@ var ByteportAPIv1 = function (api_host, username, password) {
 
         // Make initial call to obtain csrftoken
         jQuery.ajax({
-                url: login_url,
-                method: "GET",
-                async: false
+            url: that.login_url(),
+            method: "GET",
+            async: false,
+            xhrFields: {
+                withCredentials: true
             }
-        );
+        });
+
+        var csrftokencookie = jQuery.cookie("csrftoken");
+
+        if (csrftokencookie == undefined) {
+            alert("No CSRF Token was obtained (ie. cookie problems)! Can not login to Byteport instance without it!");
+            return 1;
+        }
 
         var login_data = {
             'username': username,
             'password': password,
-            'csrfmiddlewaretoken': jQuery.cookie("csrftoken")
+            'csrfmiddlewaretoken': csrftokencookie
         };
 
         jQuery.ajax({

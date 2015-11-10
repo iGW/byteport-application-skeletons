@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Byteport Application Example</title>
-
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+
+    <link rel="icon" href="favicon.ico" />
 
     <!-- Optional theme -->
     <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous"-->
@@ -22,6 +22,8 @@
     <![endif]-->
 
     <!--link rel="import" href="lib/includes/bootstrap_heads.html"-->
+    <title>Byteport Application Example</title>
+
 </head>
 <body>
 <div class="container">
@@ -141,8 +143,9 @@ $ git archive master | tar -x -C ~/my-project</pre>
         in the example views that are provided by the seed application. Use the code below as minimal starting
         points for any view.</p>
 
-    <div class="alert alert-warning" role="alert"><strong>Important: </strong> you can not have any in-line Javascript
-    in your .html-file as that code is dynamically inserted and hence browsers will not allow it to execute.</div>
+    <div class="alert alert-warning" role="alert"><strong>Important: </strong> you can not have any script-blocks
+    in your .html-file as that code is dynamically inserted and hence browsers will not allow it to execute. But
+    you can make references to the javascript such as <code>onlick=theClickhandler()</code>.</div>
 
     <strong>myview.html</strong>
     <pre>
