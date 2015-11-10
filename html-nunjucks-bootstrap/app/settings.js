@@ -1,5 +1,6 @@
-var DEBUG = true;
-var byteport_api_host = "http://acc.byteport.se";
+var DEBUG = false;
+var byteport_api_host = "http://api.byteport.se";
+//var byteport_api_host = "http://acc.byteport.se";
 //var byteport_api_host = "http://localhost:8000";
 
 /**
