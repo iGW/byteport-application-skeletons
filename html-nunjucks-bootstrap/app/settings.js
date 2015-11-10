@@ -1,6 +1,6 @@
 var DEBUG = true;
-//var byteport_api_host = "https://acc.byteport.se";
-var byteport_api_host = "http://localhost:8000";
+var byteport_api_host = "http://acc.byteport.se";
+//var byteport_api_host = "http://localhost:8000";
 
 /**
  * Register views here.

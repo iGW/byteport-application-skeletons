@@ -129,6 +129,9 @@
 
             // Check if authenticated, this could maybe be optimized with a cached result.
             byteport_client.is_authenticated(function (data) {
+                    // Store CSRF-token for future use as it is needed during POST-calls
+                    byteport_client.setSessionData(data.csrftoken, null);
+
                     if (data.is_authenticated) {
                         // YES - Authenticated vs backend, move on
                         context.is_authenticated = true;

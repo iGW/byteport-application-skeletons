@@ -1,12 +1,14 @@
 /**
- * TODO: Host this file on a CDN like this:
+ * Byteport API
  *
- * http://cdn.byteport.se/js/byteportAPIv1.js
- *
+ * @param api_host
+ * @param username
+ * @param password
+ * @param ajaxSetupErrorHandler
+ *  - Supply a custom error handle to override the default alert() on error behaviour.
  * @constructor
  */
-
-var ByteportAPIv1 = function (api_host, username, password) {
+var ByteportAPIv1 = function (api_host, username, password, ajaxSetupErrorHandler) {
     if (typeof jQuery === 'undefined') {
         throw new Error('Byteport\'s JavaScript requires jQuery')
     }
@@ -24,25 +26,35 @@ var ByteportAPIv1 = function (api_host, username, password) {
     this.LIST_NAMESPACES = '/api/v1/namespaces/';
     this.LIST_DEVICES = '/api/v1/devices/[namespace]/';
 
-    $.ajaxSetup({
-        error: function(jqXHR, exception) {
-            if (jqXHR.status === 0) {
-                alert('Not connect.\n Verify Network.');
-            } else if (jqXHR.status == 404) {
-                alert('Requested page not found. [404]');
-            } else if (jqXHR.status == 500) {
-                alert('Internal Server Error [500].');
-            } else if (exception === 'parsererror') {
-                alert('Requested JSON parse failed.');
-            } else if (exception === 'timeout') {
-                alert('Time out error.');
-            } else if (exception === 'abort') {
-                alert('Ajax request aborted.');
-            } else {
-                alert('Uncaught Error.\n' + jqXHR.responseText);
+    this.csrftoken = undefined;
+
+    if (ajaxSetupErrorHandler != undefined) {
+        $.ajaxSetup({
+            error: ajaxSetupErrorHandler
+        });
+    } else {
+        $.ajaxSetup({
+            error: function (jqXHR, exception) {
+                if (jqXHR.status === 0) {
+                    alert('Not connected.\n Verify Network.');
+                } else if (jqXHR.status == 403) {
+                    alert('Forbidden. [403]');
+                } else if (jqXHR.status == 404) {
+                    alert('Requested page not found. [404]');
+                } else if (jqXHR.status == 500) {
+                    alert('Internal Server Error [500].');
+                } else if (exception === 'parsererror') {
+                    alert('Requested JSON parse failed.');
+                } else if (exception === 'timeout') {
+                    alert('Time out error.');
+                } else if (exception === 'abort') {
+                    alert('Ajax request aborted.');
+                } else {
+                    alert('Uncaught Error.\n' + jqXHR.responseText);
+                }
             }
-        }
-    });
+        });
+    }
 
     that.get_apiv1_url = function () {
         return that.api_host + that.API_URL_BASE;
@@ -66,6 +78,8 @@ var ByteportAPIv1 = function (api_host, username, password) {
         var login_url = that.login_url();
 
         // Make initial call to obtain csrftoken
+
+        /* Commented out as the call to obtrain csrftoken should have been made before the login
         jQuery.ajax({
             url: that.login_url(),
             method: "GET",
@@ -74,8 +88,9 @@ var ByteportAPIv1 = function (api_host, username, password) {
                 withCredentials: true
             }
         });
+        */
 
-        var csrftokencookie = jQuery.cookie("csrftoken");
+        var csrftokencookie = that.csrftoken;
 
         if (csrftokencookie == undefined) {
             alert("No CSRF Token was obtained (ie. cookie problems)! Can not login to Byteport instance without it!");
@@ -103,7 +118,7 @@ var ByteportAPIv1 = function (api_host, username, password) {
 
     that.logout = function(callback) {
         var logout_data = {
-            'csrfmiddlewaretoken': jQuery.cookie("csrftoken")
+            'csrfmiddlewaretoken': that.csrftoken
         };
 
         jQuery.ajax({
@@ -138,10 +153,19 @@ var ByteportAPIv1 = function (api_host, username, password) {
                 dataType: "jsonp",
                 success: function (data) {
                     callback(data);
+                },
+                xhrFields: {
+                    withCredentials: true
                 }
             }
         );
     }
+
+    that.setSessionData = function (csrftoken, sessionid) {
+        // or aybe jQuery.cookie("csrftoken")
+        that.csrftoken = csrftoken;
+        that.sessionid = sessionid;
+    };
 
     function getCookie(cname) {
         var name = cname + "=";
