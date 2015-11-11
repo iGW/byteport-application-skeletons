@@ -14,7 +14,15 @@ var byteport_api_host = "http://api.byteport.se";
  *
  * @type {string[]}
  */
-var application_views = ['login', 'logout', 'not_found', 'home', 'devices'];
+var application_views = [
+    'login',
+    'logout',
+    'not_found',
+    'home',
+    'devices',
+    'device',
+    'timeseries'
+];
 
 // What GET-parameter to use when determining what view the user requested
 var VIEWS_PREFIX='_view';

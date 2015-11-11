@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block contents %}
+    <h3>Data for {{ data.meta.path }}</h3>
+
+    <table class="table">
+        <tr>
+            <th>Time</th>
+            <th>Value</th>
+        </tr>
+        {% for data_point in data.data.ts_data %}
+        <tr>
+            <td>
+                {{ data_point.t }}
+            </td>
+            <td>
+                {{ data_point.v }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

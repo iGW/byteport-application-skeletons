@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block contents %}
+    <h3>Device {{ data.guid }} <small>{{data.device_type}}</small></h3>
+
+    <p>
+        Last contact: <strong>{{ data.last_contact_pretty }}</strong>
+    </p>
+    <table class="table">
+        <tr>
+            <th>Field name</th>
+            <th>Value</th>
+            <th>Type</th>
+        </tr>
+        {% for field in data.fields %}
+        <tr>
+            <td>
+                <a href="?{{ views.timeseries }}&namespace={{data.namespace}}&uid={{data.uid}}&field_name={{field.name}}">{{ field.name }}</a>
+            </td>
+            <td>
+                {{ field.value }}
+            </td>
+            <td>
+                {{ field.def.data_type }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

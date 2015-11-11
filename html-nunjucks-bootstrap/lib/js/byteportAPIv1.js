@@ -1,5 +1,7 @@
 /**
- * Byteport API
+ * Byteport API. Implementation of API specification found here:
+ *
+ *  https://github.com/iGW/byteport-api/blob/master/APIv1.adoc
  *
  * @param api_host
  * @param username
@@ -24,7 +26,11 @@ var ByteportAPIv1 = function (api_host, username, password, ajaxSetupErrorHandle
     this.ACCOUNT_LOGIN = '/api/v1/login/';
     this.ACCOUNT_LOGOUT = '/api/v1/logout/';
     this.LIST_NAMESPACES = '/api/v1/namespaces/';
+
+    // Methods requiring modification to the path
     this.LIST_DEVICES = '/api/v1/devices/[namespace]/';
+    this.GET_DEVICE = '/api/v1/device/[namespace]/[uid]/';
+    this.GET_TIMESERIES_DATA = '/api/v1/timeseries/[namespace]/[uid]/[field name]/';
 
     this.csrftoken = undefined;
 
@@ -60,10 +66,6 @@ var ByteportAPIv1 = function (api_host, username, password, ajaxSetupErrorHandle
         return that.api_host + that.API_URL_BASE;
     };
 
-    that.csrftoken_url = function () {
-        return that.api_host + "/api/";
-    };
-
     that.login_url = function () {
         return that.api_host + that.ACCOUNT_LOGIN;
     };
@@ -76,19 +78,6 @@ var ByteportAPIv1 = function (api_host, username, password, ajaxSetupErrorHandle
         console.log('ByteportAPIv1 vs ' + that.get_apiv1_url());
 
         var login_url = that.login_url();
-
-        // Make initial call to obtain csrftoken
-
-        /* Commented out as the call to obtrain csrftoken should have been made before the login
-        jQuery.ajax({
-            url: that.login_url(),
-            method: "GET",
-            async: false,
-            xhrFields: {
-                withCredentials: true
-            }
-        });
-        */
 
         var csrftokencookie = that.csrftoken;
 
@@ -134,7 +123,7 @@ var ByteportAPIv1 = function (api_host, username, password, ajaxSetupErrorHandle
         });
     };
 
-    that.is_authenticated = function(callback) {
+    that.get_session = function(callback) {
         async_get_jsonp(that.SESSION_STATUS, callback);
     };
 
@@ -144,6 +133,18 @@ var ByteportAPIv1 = function (api_host, username, password, ajaxSetupErrorHandle
 
     that.get_devices = function (namespace, callback) {
         async_get_jsonp(that.LIST_DEVICES.replace('[namespace]', namespace), callback);
+    };
+
+    that.get_device = function (namespace, uid, callback) {
+        async_get_jsonp(that.GET_DEVICE.replace('[namespace]', namespace).replace('[uid]', uid),
+            function(data) {
+                // Extract the device from the list
+                callback(data[0]);
+            });
+    };
+
+    that.get_timeseries_data = function (namespace, uid, field_name, data, callback) {
+        async_get_jsonp_parameters(that.GET_TIMESERIES_DATA.replace('[namespace]', namespace).replace('[uid]', uid).replace('[field name]', field_name), data, callback);
     };
 
     function async_get_jsonp(method, callback) {
@@ -161,22 +162,27 @@ var ByteportAPIv1 = function (api_host, username, password, ajaxSetupErrorHandle
         );
     }
 
-    that.setSessionData = function (csrftoken, sessionid) {
+    function async_get_jsonp_parameters(method, parameters, callback) {
+        jQuery.ajax({
+                url: that.api_host + method,
+                method: "GET",
+                data: parameters,
+                dataType: "jsonp",
+                success: function (data) {
+                    callback(data);
+                },
+                xhrFields: {
+                    withCredentials: true
+                }
+            }
+        );
+    }
+
+    that.set_sesion_data = function (csrftoken, sessionid) {
         // or aybe jQuery.cookie("csrftoken")
         that.csrftoken = csrftoken;
         that.sessionid = sessionid;
     };
-
-    function getCookie(cname) {
-        var name = cname + "=";
-        var ca = document.cookie.split(';');
-        for(var i=0; i<ca.length; i++) {
-            var c = ca[i];
-            while (c.charAt(0)==' ') c = c.substring(1);
-            if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
-        }
-        return null;
-    }
 };
 
 

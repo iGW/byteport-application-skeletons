@@ -127,10 +127,11 @@
 
             byteport_client = new ByteportAPIv1(byteport_api_host);
 
-            // Check if authenticated, this could maybe be optimized with a cached result.
-            byteport_client.is_authenticated(function (data) {
+            // TODO: better approach is to just access the view and handle the authentication as
+            // an exception. This will have to do for now.
+            byteport_client.get_session(function (data) {
                     // Store CSRF-token for future use as it is needed during POST-calls
-                    byteport_client.setSessionData(data.csrftoken, null);
+                    byteport_client.set_sesion_data(data.csrftoken, null);
 
                     if (data.is_authenticated) {
                         // YES - Authenticated vs backend, move on
