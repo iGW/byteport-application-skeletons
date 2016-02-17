@@ -15,7 +15,7 @@
         {% for device in data %}
         <tr>
             <td>
-                <a href="?{{ views.device }}&namespace={{ device.namespace }}&uid={{ device.uid }}">{{ device.uid }}</a>
+                <a href="?{{ views.device }}&namespace={{ context.q.namespace }}&uid={{ device.uid }}">{{ device.uid }}</a>
             </td>
             <td>
                 {{ device.alias }}

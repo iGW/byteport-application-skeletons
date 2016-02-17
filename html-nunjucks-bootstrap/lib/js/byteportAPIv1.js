@@ -25,12 +25,15 @@ var ByteportAPIv1 = function (api_host, username, password, ajaxSetupErrorHandle
     this.SESSION_STATUS = '/api/v1/session/';
     this.ACCOUNT_LOGIN = '/api/v1/login/';
     this.ACCOUNT_LOGOUT = '/api/v1/logout/';
-    this.LIST_NAMESPACES = '/api/v1/namespaces/';
+    this.LIST_NAMESPACES = '/api/v1/namespace/';
 
     // Methods requiring modification to the path
-    this.LIST_DEVICES = '/api/v1/devices/[namespace]/';
-    this.GET_DEVICE = '/api/v1/device/[namespace]/[uid]/';
+    this.LIST_DEVICES = '/api/v1/namespace/[namespace]/device/';
+    this.GET_DEVICE = '/api/v1/namespace/[namespace]/device/?key=[uid]&depth=1';
     this.GET_TIMESERIES_DATA = '/api/v1/timeseries/[namespace]/[uid]/[field name]/';
+
+    // Methods for storing data
+    this.STORE_URL = '';
 
     this.csrftoken = undefined;
 
@@ -62,22 +65,21 @@ var ByteportAPIv1 = function (api_host, username, password, ajaxSetupErrorHandle
         });
     }
 
-    that.get_apiv1_url = function () {
-        return that.api_host + that.API_URL_BASE;
-    };
-
-    that.login_url = function () {
-        return that.api_host + that.ACCOUNT_LOGIN;
-    };
-
-    that.logout_url = function () {
-        return that.api_host + that.ACCOUNT_LOGOUT;
+    /**
+     * Call this method before using the store() method to setup the URL and parameters needed.
+     *
+     * @param namespace
+     * @param api_key
+     */
+    that.store_setup = function(namespace, api_key) {
+        that.namespace = namespace;
+        that.api_key = api_key;
     };
 
     that.login = function (username, password, callback) {
-        console.log('ByteportAPIv1 vs ' + that.get_apiv1_url());
+        console.log('ByteportAPIv1 vs ' + that.api_host + that.API_URL_BASE);
 
-        var login_url = that.login_url();
+        var login_url = that.api_host + that.ACCOUNT_LOGIN;
 
         var csrftokencookie = that.csrftoken;
 
@@ -111,7 +113,7 @@ var ByteportAPIv1 = function (api_host, username, password, ajaxSetupErrorHandle
         };
 
         jQuery.ajax({
-            url: that.logout_url(),
+            url: that.api_host + that.ACCOUNT_LOGOUT,
             data: logout_data,
             method: "POST",
             success: function (data) {
@@ -121,6 +123,10 @@ var ByteportAPIv1 = function (api_host, username, password, ajaxSetupErrorHandle
                 withCredentials: true
             }
         });
+    };
+
+    that.echo = function(callback) {
+        async_get_jsonp(that.ECHO, callback);
     };
 
     that.get_session = function(callback) {

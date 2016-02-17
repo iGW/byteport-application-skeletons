@@ -15,7 +15,7 @@
  *
  *  Then the namespace parameter is available as:
  *
- *  q['namespace]
+ *  context.q.namespace
  *
  * @param context  - object with useful data to the view
  * @param renderViewCallback - the callback to call last (or pass on for later call).
