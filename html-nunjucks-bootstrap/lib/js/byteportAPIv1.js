@@ -28,8 +28,8 @@ var ByteportAPIv1 = function (api_host, username, password, ajaxSetupErrorHandle
     this.LIST_NAMESPACES = '/api/v1/namespace/';
 
     // Methods requiring modification to the path
-    this.LIST_DEVICES = '/api/v1/namespace/[namespace]/device/';
-    this.GET_DEVICE = '/api/v1/namespace/[namespace]/device/?key=[uid]&depth=1';
+    this.LIST_DEVICES = '/api/v1/namespace/[namespace]/device/?depth=1';
+    this.GET_DEVICE = '/api/v1/namespace/[namespace]/device/?key=[uid]&depth=3';
     this.GET_TIMESERIES_DATA = '/api/v1/timeseries/[namespace]/[uid]/[field name]/';
 
     // Methods for storing data

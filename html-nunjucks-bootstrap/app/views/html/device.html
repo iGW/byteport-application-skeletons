@@ -11,7 +11,7 @@
             <th>Value</th>
             <th>Type</th>
         </tr>
-        {% for field in data.fields %}
+        {% for field in data.device_type.field_definitions %}
         <tr>
             <td>
                 <a href="?{{ views.timeseries }}&namespace={{data.namespace}}&uid={{data.uid}}&field_name={{field.name}}">{{ field.name }}</a>
